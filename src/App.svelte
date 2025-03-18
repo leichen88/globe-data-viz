@@ -1,174 +1,40 @@
 <script>
-  import world from "./data/world_polygons.json";
-  import boundary from "./data/world_lines.json";
-  import * as topojson from "topojson-client";
-  import { geoOrthographic, geoPath, geoCentroid } from "d3-geo";
-  import { max } from "d3-array";
-  import { scaleLinear } from "d3-scale";
-  import { interval } from "d3-timer";
-  import { select } from "d3-selection";
-  import { drag } from "d3-drag";
-  import { draw } from "svelte/transition";
-  import { spring } from "svelte/motion"; // Import the spring function
-  import Glow from "./components/Glow.svelte";
-  import Tooltip from "./components/Tooltip.svelte";
-  import Legend from "./components/Legend.svelte";
-  import data from "./data/data.js";
-
-  // State
-  let countries = topojson.feature(world, world.objects.world_polygons_simplified).features;
-  let borders = topojson.feature(boundary, boundary.objects.world_lines_simplified).features;
-  let width = $state(400);
-  let dragging = $state(false);
-  let tooltipData = $state(null);
-
-  console.log(borders)
-  
-  // Spring states for smooth rotations
-  let xRotation = spring(0, { stiffness: 0.08, damping: 0.4 }); // Use spring function
-  let yRotation = spring(-30, { stiffness: 0.17, damping: 0.7 }); // Use spring function
-
-  // Derived states
-  const height = $derived(width);
-  const projection = $derived(geoOrthographic()
-    .scale(width / 2)
-    .rotate([$xRotation, $yRotation]) // Access the spring values with $
-    .translate([width / 2, height / 2]));
-  const path = $derived(geoPath(projection));
-  const colorScale = $derived(scaleLinear()
-    .domain([0, max(data, d => d.ref)])
-    .range(["#26362e", "#0DCC6C"]));
-
-  // Populate country data
-  countries.forEach(country => {
-    const metadata = data?.find(d => d.iso3 === country.properties.iso3);
-    if (metadata) country.population = metadata.ref;
-  });
-
-  console.log(countries)
-
-  // Auto-rotation
-  const degreesPerSecond = 0.5;
-  interval(() => {
-    if (dragging || tooltipData) return;
-    xRotation.set($xRotation + degreesPerSecond); // Update spring value
-  }, 1);
-
-  // Drag interaction
-  let globe;
-  const DRAG_SENSITIVITY = 3;
-  $effect(() => {
-    const element = select(globe);
-    const dragHandler = drag()
-      .on("drag", event => {
-        dragging = true;
-        xRotation.set($xRotation + event.dx * DRAG_SENSITIVITY); // Update spring value
-        yRotation.set($yRotation - event.dy * DRAG_SENSITIVITY); // Update spring value
-      })
-      .on("end", () => (dragging = false));
-
-    element.call(dragHandler);
-    return () => dragHandler.on("drag", null).on("end", null);
-  });
-
-  // Center on selected country
-  $effect(() => {
-    if (tooltipData) {
-      const center = geoCentroid(tooltipData);
-      xRotation.set(-center[0]); // Update spring value
-      yRotation.set(-center[1]); // Update spring value
-    }
-  });
+  import GlobeViz from './components/GlobeViz.svelte';
+  import Line from './components/LineChart.svelte';
+  import KeyStats from './components/KeyStats.svelte';
 </script>
 
-<div class="chart-container" bind:clientWidth={width}>
-  <h1>Global refugee displacement at a Glance</h1>
-  <h2>Population by country of origin, 2021</h2>
-  <svg {width} {height} bind:this={globe} class:dragging>
-    <Glow />
-    
-    <circle
-      r={width / 2}
-      cx={width / 2}
-      cy={height / 2}
-      fill="#1c1c1c"
-      filter="url(#glow)"
-      on:click={() => (tooltipData = null)}
-    />
-
-    {#each countries as country}
-      <path
-        d={path(country)}
-        fill={colorScale(country.population || 0)}
-        on:click={() => (tooltipData = country)}
-        on:focus={() => (tooltipData = country)}
-        tabIndex="0"
-      />
-    {/each}
-
-    <path d={path(borders)} fill="none" stroke="#1C1C1C" />
-
-    {#if tooltipData}
-      {#key tooltipData.properties.iso3}
-        <path
-          d={path(tooltipData)}
-          fill={colorScale(tooltipData.population || 0)}
-          stroke="white"
-          in:draw
-        />
-      {/key}
-    {/if}
-  </svg>
-
-  
-  <Tooltip data={tooltipData} />
-  <Legend data={tooltipData} {colorScale} />
+<div class="page-container">
+  <GlobeViz />
+  <div class="right-section">
+    <Line />
+    <KeyStats />
+  </div>
 </div>
 
 <style>
-  .chart-container {
-    position: relative;
-    max-width: 468px;
-    margin: 0 auto;
+  .page-container {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    height: 100vh;
+    overflow-y: auto;
   }
 
-  :global(body) {
-    background: rgba(40, 40, 40);
+  .right-section {
+    display: grid;
+    grid-template-rows: 2fr 3fr;
+    gap: 16px;
+    background-color: #222222;
+    padding: 16px;
   }
 
-  svg {
-    overflow: visible;
-  }
+  @media (max-width: 768px) {
+    .page-container {
+      grid-template-columns: 1fr;
+    }
 
-  path {
-    cursor: pointer;
-  }
-
-  .dragging {
-    cursor: move;
-  }
-
-  h1,
-  h2 {
-    color: white;
-    text-align: center;
-  }
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 0.35rem;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 200;
-    margin-bottom: 1rem;
-  }
-
-  /* Typically removing :focus styles is bad accessibility practice,                                                                               but in our case the focused country has its own path outline */
-  path:focus,
-  path:focus-visible {
-    outline: none;
+    .right-section {
+      grid-template-rows: auto auto;
+    }
   }
 </style>

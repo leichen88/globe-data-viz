@@ -24,30 +24,34 @@
 </div>
 
 <style>
-  .bar {
-    height: 15px;
-    width: 100%;
-    position: relative;
-  }
-
   .legend {
     display: flex;
     gap: 6px;
+    position: absolute; /* add absolute positioning */
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+  }
+
+  .bar {
+    height: 15px;
+    width: 300px; /* fixed width for better control */
+    position: relative;
   }
 
   .label {
     color: white;
     font-size: 0.85rem;
     user-select: none;
+    white-space: nowrap; /* prevent text wrapping */
   }
 
   .line {
-    position: absolute;
+    position: absolute;  /* Changed from relative */
     top: 0;
-    height: 15px;
-    width: 2px;
-    background: white;
-    transition: left 800ms cubic-bezier(1, 0, 0, 1);
+    height: 100%;       /* Full height of container */
+    transform: translateX(-50%); /* Center the line */
   }
 </style>
 

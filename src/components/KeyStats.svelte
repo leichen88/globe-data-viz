@@ -1,11 +1,11 @@
 <script>
-    import data2 from '../data/data2.js';
+    import data from '../data/data.js';
     import { format } from 'd3-format';
     let width = $state(0); 
     let height = $state(0);
   
     // Sort data by date and get latest 100 records
-    const formattedData = data2
+    const formattedData = data
       .map(d => ({
         ...d,
         population: Number(d.population),
