@@ -1,8 +1,9 @@
 <script>
   import Globe from 'globe.gl';
-  import Tooltip from './Tooltip.svelte';
-  import Legend from './Legend.svelte';
+  import Tooltip from './Tooltip1.svelte';
+  import Legend from './Legend1.svelte';
   import data from '../data/data.js';
+  import data2 from '../data/data2.js';
   import world from '../data/world_polygons.json';
   import boundary from '../data/world_lines.json';
   import * as topojson from 'topojson-client';
@@ -16,7 +17,7 @@
 
   const formatter = d => format('.2~s')(d).replace(/G/, 'B');
 
-  const uniqueYears = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+  const uniqueYears = [...new Set(data2.map(d => d.year))].sort((a, b) => a - b);
 
   // Set default year to 2023 if it exists in uniqueYears, otherwise fall back to the first available year
   let selectedYear = $state(uniqueYears.includes(2023) ? 2023 : uniqueYears[0]);
@@ -36,7 +37,7 @@
   });
 
   // Reactive statement to filter data based on selectedYear
-  let filteredData = $derived(data.filter(d => d.year === selectedYear));
+  let filteredData = $derived(data2.filter(d => d.year === selectedYear));
   // Add derived total population
   let totalPopulation = $derived(filteredData.reduce((acc, d) => acc + d.population, 0));
 

@@ -18,9 +18,47 @@
   // State
   let countries = topojson.feature(world, world.objects.world_polygons_simplified).features;
   let borders = topojson.feature(boundary, boundary.objects.world_lines_simplified).features;
-  let width = $state(400);
+  let width = $state(600);
   let dragging = $state(false);
   let tooltipData = $state(null);
+
+
+// Spike data calculation
+let spikeData = $derived(
+  countries.map(country => {
+    const centroid = geoCentroid(country);
+    const projectedPoint = projection(centroid);
+
+    // If the projected point is null, the country is on the back side of the globe
+    if (!projectedPoint) return null;
+
+    const cx = width / 2;
+    const cy = height / 2;
+    const dx = projectedPoint[0] - cx;
+    const dy = projectedPoint[1] - cy;
+    const scale = width / 2; // Get projection scale
+
+    // Calculate the 3D normal vector
+    const normalX = dx / scale;
+    const normalY = dy / scale;
+    const normalZ = Math.sqrt(1 - normalX * normalX - normalY * normalY); // Ensure the vector is normalized
+
+    // Calculate the spike length based on the population
+    const spikeLength = heightScale(country.population || 0);
+
+    // Calculate the end point of the spike using the normal vector
+    const x2 = projectedPoint[0] + normalX * spikeLength;
+    const y2 = projectedPoint[1] + normalY * spikeLength;
+
+    return {
+      x1: projectedPoint[0],
+      y1: projectedPoint[1],
+      x2: x2,
+      y2: y2,
+      country: country
+    };
+  }).filter(d => d !== null)
+);
 
   console.log(borders)
   
@@ -37,7 +75,11 @@
   const path = $derived(geoPath(projection));
   const colorScale = $derived(scaleLinear()
     .domain([0, max(data, d => d.ref)])
-    .range(["#26362e", "#0DCC6C"]));
+    .range(["#CFFFF2", "#027B68"]));
+
+  const heightScale = $derived(scaleLinear()
+    .domain([0, max(data, d => d.ref)])
+    .range([0, width * 0.5]));
 
   // Populate country data
   countries.forEach(country => {
@@ -48,7 +90,7 @@
   console.log(countries)
 
   // Auto-rotation
-  const degreesPerSecond = 0.5;
+  const degreesPerSecond = 0.25;
   interval(() => {
     if (dragging || tooltipData) return;
     xRotation.set($xRotation + degreesPerSecond); // Update spring value
@@ -99,14 +141,40 @@
     {#each countries as country}
       <path
         d={path(country)}
-        fill={colorScale(country.population || 0)}
+        fill="#333333"
         on:click={() => (tooltipData = country)}
         on:focus={() => (tooltipData = country)}
         tabIndex="0"
       />
     {/each}
 
-    <path d={path(borders)} fill="none" stroke="#1C1C1C" />
+    {#each borders as border}
+<path d={path(border)} fill="none" stroke="#1C1C1C" stroke-width="0.5" />
+{/each}
+
+<defs>
+  <linearGradient id="spikeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+  </linearGradient>
+</defs>
+
+{#each spikeData as spike, index (spike.country.properties.iso3 + '-' + index)}
+  <line
+    x1={spike.x1}
+    y1={spike.y1}
+    x2={spike.x2}
+    y2={spike.y2}
+    stroke={colorScale(spike.country.population || 0)}
+    stroke-width="3"
+    on:click={() => (tooltipData = spike.country)}
+    on:mouseover={() => (tooltipData = spike.country)}
+    on:mouseout={() => (tooltipData = null)}
+    tabIndex="0"
+  />
+{/each}
+
+
 
     {#if tooltipData}
       {#key tooltipData.properties.iso3}
@@ -128,7 +196,7 @@
 <style>
   .chart-container {
     position: relative;
-    max-width: 468px;
+    max-width: 600px;
     margin: 0 auto;
   }
 
@@ -172,3 +240,4 @@
     outline: none;
   }
 </style>
+
