@@ -127,7 +127,7 @@
 
 <div class="globe-container">
   <div class="overlay-text">
-    <h1>Registered at a glance</h1>
+    <h1>Registration at a glance</h1>
     <h2>People registered per location, since 2001</h2>
   </div>
   <select class="year-selector" bind:value={selectedYear}>
