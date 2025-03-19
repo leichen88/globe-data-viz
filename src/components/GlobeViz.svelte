@@ -152,8 +152,8 @@
 
   .year-selector {
     position: absolute;
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid #666;
+    background-color: rgba(51, 51, 51);
+    border: 1px solid rgba(102, 102, 102);
     color: white;
     padding: 0.5rem;
     border-radius: 4px;
@@ -163,8 +163,8 @@
     z-index: 10;
   }
   .year-selector:focus {
-        outline: none;
-        border-color: #BB9D21;
+    outline: none;
+    border-color: #BB9D21;
     }
 
   #globeViz {

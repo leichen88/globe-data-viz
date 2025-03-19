@@ -199,8 +199,8 @@
     }
 
     select {
-        background-color: rgba(255, 255, 255, 0.1);
-        border: 1px solid #666;
+        background-color: rgba(102, 102, 102);
+        border: 1px solid rgba(102, 102, 102);
         color: white;
         padding: 0.5rem;
         border-radius: 4px;
@@ -220,8 +220,8 @@
     }
 
     .filter button {
-        background-color: rgba(255, 255, 255, 0.1);
-        border: 1px solid #666;
+        background-color: rgba(51, 51, 51);
+        border: 1px solid rgba(102, 102, 102);
         color: white;
         padding: 0.25rem 0.25rem;
         border-radius: 2.5px;
@@ -231,17 +231,17 @@
     }
 
     .filter button:hover {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(51, 51, 51, 0.2);
     }
 
     .filter button.active {
         border-color: #FAEB00;
-        background-color: rgba(187, 157, 33, 0.2);
+        background-color: rgba(51, 51, 51, 0.2);
     }
 
     .filter button:focus {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(187, 157, 33, 0.3);
+        box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.3);
     }
 
 </style>
