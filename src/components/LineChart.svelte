@@ -96,7 +96,7 @@
 </script>
 
 <div class="top-subsection">
-    <h2>Global forcibly displacement trend</h2>
+    <h2>People registered over time</h2>
     <div class="filter">
         <!-- <select bind:value={selectedRange}>
             <option value="all">All Years</option>
@@ -183,14 +183,14 @@
         opacity: 0.5;
     }
 
-    h2, p {
+    h2 {
         color: white;
         margin: 0;
     }
 
     h2 {
         font-size: 1.25rem;
-        font-weight: 200;
+        font-weight: 500;
         margin-bottom: 1rem;
     }
 

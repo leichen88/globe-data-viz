@@ -127,8 +127,8 @@
 
 <div class="globe-container">
   <div class="overlay-text">
-    <h1>Global forcibly displaced people at a Glance</h1>
-    <h2>Population by country of origin, 2001-2023</h2>
+    <h1>Registered at a glance</h1>
+    <h2>People registered per location, since 2001</h2>
   </div>
   <select class="year-selector" bind:value={selectedYear}>
     {#each uniqueYears as year}
@@ -200,5 +200,19 @@
     font-weight: 200;
     margin-bottom: 1rem;
   }
+
+  @media (max-width: 768px) {
+  .year-selector {
+    top: 10px;
+    left: 10px;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .overlay-text {
+    top: 10px;
+    font-size: 1.5rem;
+  }
+}
 </style>
   

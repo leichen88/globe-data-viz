@@ -18,7 +18,7 @@
   </script>
   
   <div class="bottom-subsection">
-      <h2>Latest key statistics</h2>
+      <h2>Latest registration</h2>
       <div class="chart-container">
           <div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
             <div class="key-stats">
@@ -85,15 +85,14 @@
     position: absolute;
   }
 
-  h2,
-  p {
+  h2{
     color: white;
     margin: 0;
   }
 
   h2 {
     font-size: 1.25rem;
-    font-weight: 200;
+    font-weight: 500;
     margin-bottom: 1rem;
   }
 
@@ -181,7 +180,7 @@
 
     .stats-grid {
       font-size: 0.85rem;
-      grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+      grid-template-columns: repeat(2, 1fr); 
     }
 
     .header-row,
